@@ -123,8 +123,6 @@ describe('Basic user flow for Website', () => {
     const cardCountEl = await page.$('#cart-count');
     const cardCountProp = await cardCountEl.getProperty('innerText');
     const cardCount = await cardCountProp.jsonValue();
-    console.log(cardCount);
-
 
     expect(cardCount).toBe('20');
 
@@ -133,7 +131,7 @@ describe('Basic user flow for Website', () => {
   }, 10000);
 
   // Check to make sure that after you reload the page it remembers all of the items in your cart
-  it.skip('Checking number of items in cart on screen after reload', async () => {
+  it('Checking number of items in cart on screen after reload', async () => {
     console.log('Checking number of items in cart on screen after reload...');
 
     /**
@@ -143,6 +141,33 @@ describe('Basic user flow for Website', () => {
      * Also check to make sure that #cart-count is still 20
      * Remember to remove the .skip from this it once you are finished writing this test.
      */
+    await page.reload();
+
+    const prodItemsData = await page.$$eval('product-item', prodItems => {
+      return prodItems.map(item => {
+        const itemButton = item.shadowRoot.querySelector('button');
+
+        // Grab all of the json data stored inside
+        return data = itemButton.innerText;
+      });
+    });
+
+    console.log(`Checking product item 1/${prodItemsData.length}`);
+
+    itemsStillAdded = true;
+    // Make sure the title, price, and image are populated in the JSON
+    prodItemsData.forEach(prod=>{
+      if (prod != "Remove from Cart") { itemsStillAdded = false; }
+    })
+
+    expect(itemsStillAdded).toBe(true);
+
+    const cardCountEl = await page.$('#cart-count');
+    const cardCountProp = await cardCountEl.getProperty('innerText');
+    const cardCount = await cardCountProp.jsonValue();
+
+    expect(cardCount).toBe('20');
+
 
   }, 10000);
 
