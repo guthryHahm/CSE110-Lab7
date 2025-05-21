@@ -77,6 +77,7 @@ describe('Basic user flow for Website', () => {
       const innerText = prodItemButton.innerText;
       //const buttonText = innerText.jsonValue();
       //return innerText.jsonValue();
+      prodItemButton.click();
       return innerText;
       //return innerText;
     });
@@ -97,7 +98,7 @@ describe('Basic user flow for Website', () => {
 
   // Check to make sure that after clicking "Add to Cart" on every <product-item> that the Cart
   // number in the top right has been correctly updated
-  it.skip('Checking number of items in cart on screen', async () => {
+  it('Checking number of items in cart on screen', async () => {
     console.log('Checking number of items in cart on screen...');
 
     /**
@@ -107,6 +108,27 @@ describe('Basic user flow for Website', () => {
      * Check to see if the innerText of #cart-count is 20
      * Remember to remove the .skip from this it once you are finished writing this test.
      */
+    // const prodItems = await page.$$('product-item');
+
+
+     await page.$$eval('product-item', (prodItems) => {
+         prodItems.forEach(item => {
+           const button = item.shadowRoot.querySelector('button');
+           button.click();
+         });
+    });
+
+
+
+    const cardCountEl = await page.$('#cart-count');
+    const cardCountProp = await cardCountEl.getProperty('innerText');
+    const cardCount = await cardCountProp.jsonValue();
+    console.log(cardCount);
+
+
+    expect(cardCount).toBe('20');
+
+
 
   }, 10000);
 
