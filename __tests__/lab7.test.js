@@ -224,7 +224,7 @@ describe('Basic user flow for Website', () => {
 
   // Checking to make sure that it remembers us removing everything from the cart
   // after we refresh the page
-  it.skip('Checking number of items in cart on screen after reload', async () => {
+  it('Checking number of items in cart on screen after reload', async () => {
     console.log('Checking number of items in cart on screen after reload...');
 
     /**
@@ -234,12 +234,37 @@ describe('Basic user flow for Website', () => {
      * Also check to make sure that #cart-count is still 0
      * Remember to remove the .skip from this it once you are finished writing this test.
      */
+    await page.reload();
+
+    const prodItemsData = await page.$$eval('product-item', prodItems => {
+      return prodItems.map(item => {
+        const itemButton = item.shadowRoot.querySelector('button');
+
+        // Grab all of the json data stored inside
+        return data = itemButton.innerText;
+      });
+    });
+
+
+    let itemsStillUnadded = true;
+    // Make sure the title, price, and image are populated in the JSON
+    prodItemsData.forEach(prod=>{
+      if (prod != "Add to Cart") { itemsStillUnadded = false; }
+    })
+
+    expect(itemsStillUnadded).toBe(true);
+
+    const cardCountEl = await page.$('#cart-count');
+    const cardCountProp = await cardCountEl.getProperty('innerText');
+    const cardCount = await cardCountProp.jsonValue();
+
+    expect(cardCount).toBe('0');
 
   }, 10000);
 
   // Checking to make sure that localStorage for the cart is as we'd expect for the
   // cart being empty
-  it.skip('Checking the localStorage to make sure cart is correct', async () => {
+  it('Checking the localStorage to make sure cart is correct', async () => {
     console.log('Checking the localStorage...');
 
     /**
@@ -247,6 +272,15 @@ describe('Basic user flow for Website', () => {
      * At this point he item 'cart' in localStorage should be '[]', check to make sure it is
      * Remember to remove the .skip from this it once you are finished writing this test.
      */
+    let correctCart = true;
+
+    const cart = await page.evaluate(() => {
+      return localStorage.getItem('cart');
+    });
+
+    if (cart != '[]'){correctCart = false;};
+
+    expect(correctCart).toBe(true);
 
   });
 });
