@@ -154,7 +154,7 @@ describe('Basic user flow for Website', () => {
 
     console.log(`Checking product item 1/${prodItemsData.length}`);
 
-    itemsStillAdded = true;
+    let itemsStillAdded = true;
     // Make sure the title, price, and image are populated in the JSON
     prodItemsData.forEach(prod=>{
       if (prod != "Remove from Cart") { itemsStillAdded = false; }
@@ -172,7 +172,7 @@ describe('Basic user flow for Website', () => {
   }, 10000);
 
   // Check to make sure that the cart in localStorage is what you expect
-  it.skip('Checking the localStorage to make sure cart is correct', async () => {
+  it('Checking the localStorage to make sure cart is correct', async () => {
 
     /**
      **** TODO - STEP 5 **** 
@@ -180,7 +180,17 @@ describe('Basic user flow for Website', () => {
        '[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20]', check to make sure it is
      * Remember to remove the .skip from this it once you are finished writing this test.
      */
+    let correctCart = true;
 
+    const cart = await page.evaluate(() => {
+      return JSON.parse(localStorage.getItem('cart'));
+    });
+
+    for (let i = 0;i < cart.length; i++){
+      if (cart[i] != i + 1){correctCart = false;};
+    }
+
+    expect(correctCart).toBe(true);
   });
 
   // Checking to make sure that if you remove all of the items from the cart that the cart
